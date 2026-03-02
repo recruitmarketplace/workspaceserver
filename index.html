@@ -714,7 +714,7 @@ let _productsCache=null;
 async function fetchProducts(){
 if(_productsCache)return _productsCache;
 const res=await fetch('https://www.fanbasis.com/public-api/products?per_page=50',{
-headers:{'Authorization':'Bearer '+FANBASIS_KEY}
+headers:{'X-API-KEY':FANBASIS_KEY}
 });
 const data=await res.json();
 _productsCache=(data.data&&data.data.data)||[];
