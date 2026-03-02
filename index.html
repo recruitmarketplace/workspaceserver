@@ -216,6 +216,24 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
 .pricing-renewal p{font-size:.85rem;color:var(--t2);line-height:1.7}
 .pricing-renewal .renewal-price{font-family:var(--mono);font-weight:800;color:var(--g);font-size:1.1rem}
 @media(max-width:700px){.pricing-container{grid-template-columns:1fr}}
+/* CHECKOUT LOADING */
+.pricing-cta.loading,.pricing-cta-secondary.loading{pointer-events:none;opacity:.7;position:relative}
+.pricing-cta.loading .btn-text,.pricing-cta-secondary.loading .btn-text{visibility:hidden}
+.pricing-cta.loading::after,.pricing-cta-secondary.loading::after{content:'';position:absolute;width:20px;height:20px;border:2.5px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.checkout-error{text-align:center;margin-top:14px;padding:10px 16px;border-radius:10px;background:var(--red-dim);border:1px solid rgba(239,68,68,.2);color:var(--red);font-size:.82rem;display:none}
+.checkout-error.show{display:block}
+/* SUCCESS MODAL */
+.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s ease}
+.success-overlay.show{opacity:1;pointer-events:auto}
+.success-modal{background:var(--bg3);border:1px solid var(--border-2);border-radius:22px;padding:48px 40px;max-width:480px;width:90%;text-align:center;transform:translateY(20px) scale(.96);transition:transform .5s var(--spring);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.success-overlay.show .success-modal{transform:translateY(0) scale(1)}
+.success-icon{width:64px;height:64px;border-radius:50%;background:var(--g-dim);border:2px solid var(--g);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.success-icon svg{width:32px;height:32px;color:var(--g)}
+.success-modal h2{font-size:1.5rem;margin-bottom:10px}
+.success-modal p{font-size:.9rem;color:var(--t2);line-height:1.7;margin-bottom:24px}
+.success-close{padding:12px 32px;border-radius:12px;background:var(--g);color:var(--bg);font-weight:700;font-size:.9rem;border:none;cursor:pointer;transition:all .3s ease;box-shadow:0 4px 16px var(--g-glow)}
+.success-close:hover{background:var(--g2);transform:translateY(-1px)}
 /* SPECS */
 .specs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:48px}
 .spec-item{padding:22px 18px;border-radius:14px;background:var(--bg3);border:1px solid var(--border-1);text-align:center;transition:all .4s var(--ease)}
@@ -263,6 +281,16 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
 <div class="atmos-noise"></div>
 <div class="particles" id="particles"></div>
 
+<!-- SUCCESS MODAL -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-modal">
+    <div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <h2 class="tg">Server Provisioning Started!</h2>
+    <p>Your Workspace Server is being set up. Check your email for login credentials and a quick-start guide — you'll receive them within a few hours.</p>
+    <button class="success-close" onclick="document.getElementById('successOverlay').classList.remove('show')">Got It</button>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="ws-nav" id="wsNav">
 <div class="ws-nav-inner">
@@ -270,7 +298,7 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
     <div class="ws-logo-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
     </div>
-    Workspace Server
+    Workspace Server <span style="font-weight:400;font-size:.7rem;color:var(--t3);margin-left:2px">by NeroAI</span>
   </a>
   <div class="ws-links">
     <a href="#problem" class="magnetic" data-strength="8">The Problem</a>
@@ -278,6 +306,7 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
     <a href="#specs" class="magnetic" data-strength="8">Server Specs</a>
     <a href="#pricing" class="magnetic" data-strength="8">Pricing</a>
     <a href="#faq" class="magnetic" data-strength="8">FAQ</a>
+    <a href="https://portal.nerotrades.com/" class="magnetic" data-strength="8">Client Portal</a>
   </div>
   <div class="ws-right">
     <button class="ws-theme-toggle magnetic" data-strength="12" id="wsThemeToggle" aria-label="Toggle theme">
@@ -305,6 +334,7 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
 <a href="#specs" onclick="closeMob()">Server Specs</a>
 <a href="#pricing" onclick="closeMob()">Pricing</a>
 <a href="#faq" onclick="closeMob()">FAQ</a>
+<a href="https://portal.nerotrades.com/" onclick="closeMob()">Client Portal</a>
 <a href="#pricing" class="btn-primary" onclick="closeMob()">Get Your Server</a>
 </div>
 
@@ -314,9 +344,9 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="wrap">
-  <div class="hero-badge rv"><span class="pulse-dot"></span> Dedicated VPS for MetaTrader 4 &amp; 5</div>
+  <div class="hero-badge rv"><span class="pulse-dot"></span> A NeroAI Infrastructure Product</div>
   <h1 class="rv" style="transition-delay:80ms">What Happens to Your Algorithm<br>When Your <span class="tg">Internet Drops?</span></h1>
-  <p class="sub rv" style="transition-delay:160ms">If your trading algorithm is running on a home computer, you already know the answer. One outage, one crash, one missed trade — and the edge you spent months building disappears. What if your algorithm had infrastructure that never went down?</p>
+  <p class="sub rv" style="transition-delay:160ms">Built for NeroAI algorithm clients — and any trader running MT4/MT5 EAs. If your trading algorithm is running on a home computer, you already know the answer. One outage, one crash, one missed trade — and the edge you spent months building disappears. What if your algorithm had infrastructure that never went down?</p>
   <div class="hero-btns rv" style="transition-delay:240ms">
     <a href="#pricing" class="btn-primary magnetic" data-strength="10">See Pricing <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     <a href="#how" class="btn-secondary magnetic" data-strength="10">How It Works</a>
@@ -454,7 +484,7 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
   <div style="text-align:center">
     <div class="label rv">Pricing</div>
     <h2 class="rv" style="transition-delay:80ms">One Server. <span class="tg">Transparent Pricing.</span></h2>
-    <p class="sub rv" style="transition-delay:160ms;max-width:600px;margin:14px auto 0">How much is a missed trade worth to you? How many times has your home setup already cost you? One dedicated server — choose the billing that works for you.</p>
+    <p class="sub rv" style="transition-delay:160ms;max-width:600px;margin:14px auto 0">How much is a missed trade worth to you? How many times has your home setup already cost you? One dedicated server — choose the billing that works for you. Secure checkout powered by Fanbasis.</p>
   </div>
   <div class="pricing-container">
     <!-- MONTHLY -->
@@ -462,7 +492,7 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
       <div class="pricing-period">Monthly</div>
       <div class="pricing-amount">
         <span class="pricing-dollar">$</span>
-        <span class="pricing-value">49</span>
+        <span class="pricing-value">97</span>
         <span class="pricing-freq">/mo</span>
       </div>
       <div class="pricing-note">Billed monthly. Cancel anytime.</div>
@@ -476,7 +506,7 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Remote Desktop Access</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>24/7 Server Monitoring</li>
       </ul>
-      <a href="#contact" class="pricing-cta-secondary magnetic" data-strength="8">Get Started</a>
+      <button onclick="handleCheckout('monthly')" class="pricing-cta-secondary magnetic" data-strength="8" id="btn-monthly"><span class="btn-text">Get Started</span></button>
     </div>
     <!-- YEARLY -->
     <div class="pricing-card featured rv" style="transition-delay:100ms">
@@ -484,28 +514,29 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
       <div class="pricing-period">Yearly</div>
       <div class="pricing-amount">
         <span class="pricing-dollar">$</span>
-        <span class="pricing-value">499</span>
+        <span class="pricing-value">997</span>
         <span class="pricing-freq">/yr</span>
       </div>
-      <div class="pricing-save">SAVE 15% — $41.58/mo equivalent</div>
+      <div class="pricing-save">SAVE 15% — $83.08/mo equivalent</div>
       <div class="pricing-note">Billed annually. One payment, full year.</div>
       <div class="pricing-divider"></div>
       <ul class="pricing-features">
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in Monthly — same server</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Save $89 vs. paying monthly</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Save $167 vs. paying monthly</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority provisioning</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Locked-in rate for 12 months</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>99.9% Uptime SLA</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Remote Desktop Access</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>24/7 Server Monitoring</li>
       </ul>
-      <a href="#contact" class="pricing-cta magnetic" data-strength="8">Get Started — Save 15%</a>
+      <button onclick="handleCheckout('yearly')" class="pricing-cta magnetic" data-strength="8" id="btn-yearly"><span class="btn-text">Get Started — Save 15%</span></button>
     </div>
   </div>
+  <div class="checkout-error" id="checkoutError"></div>
   <!-- RENEWAL INFO -->
   <div class="pricing-renewal rv" style="transition-delay:200ms">
     <h4>Loyalty Renewal Pricing</h4>
-    <p>After your initial term, both plans renew at a loyalty rate of <span class="renewal-price">$147/yr</span> (3x monthly rate, billed annually). That's just $12.25/mo to keep your server running. We reward clients who stay — not penalize them.</p>
+    <p>After your initial term, both plans renew at a loyalty rate of <span class="renewal-price">$291/yr</span> (3x monthly rate, billed annually). That's just $24.25/mo to keep your server running. We reward clients who stay — not penalize them.</p>
   </div>
 </div>
 </section>
@@ -567,7 +598,7 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
     </div>
     <div class="faq-item rv" style="transition-delay:350ms">
       <div class="faq-q">How does renewal pricing work?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-      <div class="faq-answer"><div class="faq-answer-inner">After your initial term (monthly or yearly), both plans renew at our loyalty rate of $147/year — that's 3x the monthly rate, billed annually. This comes out to just $12.25/month. We believe in rewarding long-term clients, not surprising them with price increases.</div></div>
+      <div class="faq-answer"><div class="faq-answer-inner">After your initial term (monthly or yearly), both plans renew at our loyalty rate of $291/year — that's 3x the monthly rate, billed annually. This comes out to just $24.25/month. We believe in rewarding long-term clients, not surprising them with price increases.</div></div>
     </div>
   </div>
 </div>
@@ -595,12 +626,12 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600}
         <div class="ws-logo-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         </div>
-        Workspace Server
+        Workspace Server <span style="font-weight:400;font-size:.7rem;color:var(--t3);margin-left:2px">by NeroAI</span>
       </a>
-      <p>Dedicated virtual private servers built for MetaTrader algorithm execution. Enterprise-grade uptime. Always-on infrastructure.</p>
+      <p>A NeroAI infrastructure product. Dedicated virtual private servers built for MetaTrader algorithm execution. Enterprise-grade uptime. Always-on infrastructure.</p>
     </div>
     <div class="footer-col"><h4>Product</h4><a href="#specs">Server Specs</a><a href="#pricing">Pricing</a><a href="#how">How It Works</a></div>
-    <div class="footer-col"><h4>Support</h4><a href="#faq">FAQ</a><a href="mailto:support@workspaceserver.com">Contact</a></div>
+    <div class="footer-col"><h4>NeroAI</h4><a href="https://nerotrades.com">NeroAI Home</a><a href="https://portal.nerotrades.com/">Client Portal</a><a href="https://nerotrades.com/contact">Contact</a></div>
     <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Acceptable Use</a></div>
   </div>
 </div>
@@ -650,6 +681,45 @@ counterObs.observe(document.querySelector('.counter-strip'));
 // MOBILE MENU
 function closeMob(){document.getElementById('mobMenu').classList.remove('open')}
 document.getElementById('mobToggle').addEventListener('click',()=>{document.getElementById('mobMenu').classList.toggle('open')});
+
+// FANBASIS CHECKOUT
+async function handleCheckout(plan){
+const btn=document.getElementById(plan==='monthly'?'btn-monthly':'btn-yearly');
+const errEl=document.getElementById('checkoutError');
+errEl.classList.remove('show');
+btn.classList.add('loading');
+try{
+const body=plan==='monthly'?{
+amount_cents:9700,type:'subscription',
+product:{title:'Workspace Server — Monthly'},
+subscription:{frequency_days:30},
+success_url:window.location.origin+window.location.pathname+'?purchased=monthly'
+}:{
+amount_cents:99700,type:'subscription',
+product:{title:'Workspace Server — Yearly'},
+subscription:{frequency_days:365},
+success_url:window.location.origin+window.location.pathname+'?purchased=yearly'
+};
+const res=await fetch('https://www.fanbasis.com/public-api/checkout-sessions',{
+method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer EoRkTFentiUONpxzij8XktawRhtNGoqR'},
+body:JSON.stringify(body)
+});
+const data=await res.json();
+if(data.data&&data.data.payment_link){window.location.href=data.data.payment_link}
+else{throw new Error(data.message||'Unable to create checkout session.')}
+}catch(err){
+errEl.textContent=err.message||'Something went wrong. Please try again or contact support.';
+errEl.classList.add('show');
+btn.classList.remove('loading');
+}}
+
+// SUCCESS STATE
+(function(){
+const params=new URLSearchParams(window.location.search);
+if(params.get('purchased')){
+document.getElementById('successOverlay').classList.add('show');
+window.history.replaceState({},'',window.location.pathname);
+}})();
 </script>
 </body>
 </html>
